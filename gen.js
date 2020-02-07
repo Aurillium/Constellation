@@ -40,7 +40,7 @@ class Star {
         this._refresh();
     }
 
-    constructor(x, y, size, id, colour="#dddddd", debug=true) {
+    constructor(x, y, size, id, colour="#ffffff", debug=true) {
         this._x = x;
         this._y = y;
         this._size = size;
@@ -51,7 +51,11 @@ class Star {
         let canvas = document.getElementById("canvas");
         canvas.insertAdjacentHTML("beforeend", '<g id="star' + this._id.toString() + '" class="star" style="fill:' + colour + ';transform-origin:' + x.toString() + 'px ' + y.toString() + 'px" transform="scale(' + size.toString() + ') translate(' + x.toString() + ',' + y.toString() + ')"><circle r="1" class="outer"></circle><circle r="1"></circle></g>');
         this._element = document.getElementById("star" + this._id.toString());
-        this.element.addEventListener('click', e => {console.log(this);this.onclick(this, e);});
+        this.element.addEventListener('click', e => {this.onclick(this, e);});
+        var e = this.element;
+        setTimeout(function() {
+            e.firstChild.style.animationPlayState = "running";
+        }, Math.random() * 5000);
     }
     _refresh() {
         this.element.setAttribute("transform", 'scale(' + this._size.toString() + ') translate(' + this._x.toString() + ',' + this._y.toString() + ')');
@@ -62,16 +66,20 @@ class Star {
     }
 
     onclick(self, e) {
-        /*for (let i=0; i < self._links.length; i++) {
-            self.sendMessage(self._links[i]);
-            console.log("Relayed message '" + self.message.toString() + "' to _links[" + i.toString() + "].");
-        }*/
-        console.log("hi.");
+        console.log("Star clicked at (" + self.x.toString() + ", " + self.y.toString() + ").");
         if (linkA) {
             if (linkA != self) {
-                links.push(new Linker(linkA, self));
-                linkA = null;
+                if (linkA.x <= self.x) {
+                    if (linkA.y <= self.y) {
+                        links.push(new Linker(linkA, self));
+                    } else {
+                        links.push(new Linker(self, linkA));
+                    }
+                } else {
+                    links.push(new Linker(self, linkA));
+                }
             }
+            linkA = null;
         } else {
             linkA = self;
         }
@@ -92,7 +100,7 @@ class Linker {
     }
 
     constructor(pointA, pointB) {
-        this.colour = "#888888"
+        this.colour = "rgba(255, 255, 255, 0.5)"
         this._origin = pointA;
         this._dest = pointB;
         pointA._links.push(this);
@@ -106,7 +114,7 @@ class Linker {
         this._length = Math.sqrt(Math.pow(this._x - this._dx, 2) + Math.pow(this._y - this._dy, 2));
         this._rotation = Math.atan((this._y - this._dy) / (this._x - this._dx)) * 180 / Math.PI;
         let code = '<rect id="link' + this._num + '" class="link" x="' + this._x.toString() + '" y="' + this._y.toString() + '" width="' + this._thickness.toString() + '" height="' + this._length.toString() + '" style="fill:' + this.colour + ';transform-origin:' + (this._x + this._thickness / 2).toString() + 'px ' + this._y.toString() + 'px" transform="rotate(' + (this._rotation - 90).toString() + ')"></rect>';
-        back = document.getElementById("back");
+        var back = document.getElementById("back");
         back.insertAdjacentHTML("afterend", code);
         this._element = document.getElementById("link" + this._num);
     }
@@ -119,10 +127,6 @@ class Linker {
         } else {
             return 0;
         }
-    }
-
-    async sendMessage(from) {
-
     }
 
     _refresh() {
@@ -141,8 +145,22 @@ class Linker {
     }
 }
 
-function start(stars) {
+function start(mapper, callback) {
+    var stars = mapper();
     for (let i = 0; i < stars.length; i++) {
         sky.push(new Star(stars[i][0], stars[i][1], stars[i][2], sky.length));
     }
+    document.addEventListener("keydown", function calculate(e) {
+        if (e.key == "Enter") {
+            var final = new Uint8Array(links.length * 4);
+            links.sort((a, b) => a._num - b._num);
+            for (let i = 0; i < links.length; i++) {
+                final[i * 4] = links[i]._origin.x / 8;
+                final[i * 4 + 1] = links[i]._origin.y / 4;
+                final[i * 4 + 2] = links[i]._dest.x / 8;
+                final[i * 4 + 3] = links[i]._dest.y / 4;
+            }
+            callback(final);
+        }
+    });
 }
