@@ -1,27 +1,30 @@
-body, svg {
+body {
     background-color: midnightblue;
     padding: 0px;
     margin: 0px;
 }
 
-@keyframes expandout {
+@keyframes twinkle {
     0% {
         transform: scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(1.2);
         opacity: 1;
     }
     100% {
-        transform: scale(2.2);
-        opacity: 0;
+        transform: scale(1);
+        opacity: 0.4;
     }
 }
-.node > .outer1 {
-    animation: expandout 5s ease infinite;
-}
-.node > .outer2 {
-    animation: expandout 5s 2.5s ease infinite;
+
+.star > * {
+    animation: twinkle 5s ease infinite;
+    animation-play-state: paused;
+    transition-duration: 200ms;
 }
 
-.human:not(:active) > .outer {
-    animation: expandout 2.5s ease;
-    animation-iteration-count: 1;
+.star:hover > * {
+    transform: scale(4) !important;
 }
