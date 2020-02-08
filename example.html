@@ -1,0 +1,29 @@
+<!doctype <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Generic Login Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script type="text/javascript">
+        function constellationHandler(value) {
+            console.log(value)
+        }
+        function starMapper() {
+                var map = [];
+                for (let i = 0; i < 32; i++) {
+                    for (let j = 0; j < 32; j++) {
+                        map.push([i * 64, j * 64, 8]);
+                    }
+                }
+                return map;
+            }
+    </script>
+</head>
+<body>
+    <button onclick="window.open('display.html');">
+        Password
+    </button>
+</body>
+</html>
