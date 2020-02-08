@@ -18,11 +18,25 @@ body {
         opacity: 0.4;
     }
 }
+@keyframes link-twinkle {
+    0% {
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0.2;
+    }
+}
 
 .star > * {
     animation: twinkle 5s ease infinite;
     animation-play-state: paused;
     transition-duration: 200ms;
+}
+.link {
+    animation: twinkle-link 5s ease infinite;
 }
 
 .star:hover > * {
