@@ -100,7 +100,7 @@ class Linker {
     }
 
     constructor(pointA, pointB) {
-        this.colour = "rgba(255, 255, 255, 0.5)"
+        this.colour = "#ffffff"
         this._origin = pointA;
         this._dest = pointB;
         pointA._links.push(this);
@@ -113,6 +113,9 @@ class Linker {
         this._dy = this._dest.y;
         this._length = Math.sqrt(Math.pow(this._x - this._dx, 2) + Math.pow(this._y - this._dy, 2));
         this._rotation = Math.atan((this._y - this._dy) / (this._x - this._dx)) * 180 / Math.PI;
+        if (this._y <= this._dy && this._x >= this._dx) {
+            this._rotation += 180;
+        }
         let code = '<rect id="link' + this._num + '" class="link" x="' + this._x.toString() + '" y="' + this._y.toString() + '" width="' + this._thickness.toString() + '" height="' + this._length.toString() + '" style="fill:' + this.colour + ';transform-origin:' + (this._x + this._thickness / 2).toString() + 'px ' + this._y.toString() + 'px" transform="rotate(' + (this._rotation - 90).toString() + ')"></rect>';
         var back = document.getElementById("back");
         back.insertAdjacentHTML("afterend", code);
@@ -136,6 +139,9 @@ class Linker {
         this._dy = this._dest.y;
         this._length = Math.sqrt(Math.pow(this._x - this._dx, 2) + Math.pow(this._y - this._dy, 2));
         this._rotation = Math.atan((this._y - this._dy) / (this._x - this._dx)) * 180 / Math.PI;
+        if (this._y <= this._dy && this._x >= this._dx) {
+            this._rotation += 180;
+        }
         this.element.setAttribute("x", this._x.toString());
         this.element.setAttribute("y", this._y.toString());
         this.element.setAttribute("width", this._thickness.toString());
@@ -146,6 +152,7 @@ class Linker {
 }
 
 function start(mapper, callback) {
+    console.log(mapper);
     var stars = mapper();
     for (let i = 0; i < stars.length; i++) {
         sky.push(new Star(stars[i][0], stars[i][1], stars[i][2], sky.length));
@@ -154,11 +161,12 @@ function start(mapper, callback) {
         if (e.key == "Enter") {
             var final = new Uint8Array(links.length * 4);
             links.sort((a, b) => a._num - b._num);
+            var box = document.getElementById("canvas").getAttribute("viewBox").split(" ");
             for (let i = 0; i < links.length; i++) {
-                final[i * 4] = links[i]._origin.x / 8;
-                final[i * 4 + 1] = links[i]._origin.y / 4;
-                final[i * 4 + 2] = links[i]._dest.x / 8;
-                final[i * 4 + 3] = links[i]._dest.y / 4;
+                final[i * 4] = links[i]._origin.x / (box[2] / 256);
+                final[i * 4 + 1] = links[i]._origin.y / (box[3] / 256);
+                final[i * 4 + 2] = links[i]._dest.x / (box[2] / 256);
+                final[i * 4 + 3] = links[i]._dest.y / (box[3] / 256);
             }
             callback(final);
         }
