@@ -36,7 +36,7 @@ body {
     transition-duration: 200ms;
 }
 .link {
-    animation: twinkle-link 5s ease infinite;
+    animation: link-twinkle 5s ease infinite;
 }
 
 .star:hover > * {
